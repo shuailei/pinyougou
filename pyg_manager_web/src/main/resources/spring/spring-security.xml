@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<!--设置静态资源放行，不然下面的login-page等属性指定的页面都会访问不到变成大白块-->
+	<http pattern="/*.html" security="none"></http>
+	<http pattern="/css/**" security="none"></http>
+	<http pattern="/img/**" security="none"></http>
+	<http pattern="/js/**" security="none"></http>
+	<http pattern="/plugins/**" security="none"></http>
+	<http pattern="/brand/*" security="none"></http>
+
+	<!--注意springsecurity默认对框架集是拦截的，此时会出现  it set 'X-Frame-Options' to 'DENY'，X表示横向的-->
+
+	<!-- 页面的拦截规格 use-expressions:默认启用SPEL表达式 需要将 access="hasRole('ROLE_USER')" -->
+	<http use-expressions="false">
+		<!-- 当前用户必须有ROLE_USER的角色才可以访问根目录及所属子目录的资源 两个*表示所有的 -->
+		<intercept-url pattern="/**" access="ROLE_USER" />
+		<!-- 该标签表示 开启表单登录功能，会有默认登录（验证）页 这是Springsecurity自己自带默认的表单，很low，我们需要改成我们自己设计的表单
+			指定页面，使用它的属性login-page来指定，而登陆成功跳转使用属性default-target-url来指定成功跳转页面
+			属性always-use-default-target保证一定成功跳转到index.html页面
+			 如果想修改当前用户登陆的用户名可在下面标签中添加属性 username-parameter="要改成的目标用户名" password-parameter="要修改成的密码属性"-->
+		<form-login login-page="/login.html" default-target-url="/admin/index.html" always-use-default-target="true"/>
+		<!-- 拦截验证时，一定得关闭跨域访问 -->
+		<csrf disabled="true" />
+		<!-- 保证其它域的框架也可以嵌套进来 -->
+		<headers>
+			<frame-options policy="SAMEORIGIN"></frame-options>
+		</headers>
+		<!--添加登陆退出方法，是security的默认方法，可以直接调用-->
+        <logout/>
+	</http>
+	<!-- 认证管理器 需要认证的用户名和密码是写死的 -->
+	<authentication-manager>
+		<!-- 认证提供者 -->
+		<authentication-provider>
+			<user-service>
+				<!-- 配置当前系统的用户 authorities该用户属于哪个角色 -->
+				<user name="admin" password="123456" authorities="ROLE_USER" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+</beans:beans>

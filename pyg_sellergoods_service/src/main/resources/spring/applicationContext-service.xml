@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!--service要跟controller交互数据-->
+	<!--上zookeeper注册自己的service，注册完了之后还要交互数据，默认的用来交互数据的（被消费者访问到的）端口号是20880，但因为我们现在只有一台电脑要完成所有的service，只能根据服务一个一个将端口号往上加，模拟在多台电脑上进行开发-->
+    <dubbo:protocol name="dubbo" port="20881"></dubbo:protocol>
+	<dubbo:application name="pinyougou-sellergoods-service"/>  
+    <dubbo:registry address="zookeeper://127.0.0.1:2181"/>
+    <dubbo:annotation package="com.pinyougou.sellergoods.service.impl" />  <!--这个是指定被注册的服务所在的包-->
+   
+   
+</beans>
